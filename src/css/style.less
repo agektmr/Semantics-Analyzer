@@ -1,0 +1,126 @@
+body {
+  margin:8px;
+  width:300px;
+  font-size:0.8em;
+}
+#projects {
+  list-style:none;
+  margin-top:8px;
+  padding:0;
+  font-family:Arial;
+}
+.accordion {
+  -webkit-transition:max-height 0.2s ease-out;
+  max-height:24px;
+  overflow-y:hidden;
+  white-space:nowrap;
+  &.open {
+    max-height:300px;
+    overflow-y:scroll;
+  }
+  &:first-child span.button {
+    display:none;
+  }
+  .project {
+    background:-webkit-linear-gradient(#fff, #aaa);
+    padding:2px 4px;
+    border:outset 1px #aaa;
+    height:18px;
+    overflow:hidden;
+    white-space:nowrap;
+    &:hover {
+      background:-webkit-linear-gradient(#fff, #eee);
+      cursor:pointer;
+    }
+    span.name {
+      width:256px;
+    }
+    span.name.current {
+      font-weight:bold;
+    }
+  }
+  input[type='text'] {
+    width:220px;
+  }
+  ul {
+    margin:0;
+    padding:0;
+    border:outset 1px #eee;
+    text-decoration:none;
+  }
+  li {
+    .name {
+      width:258px;
+      a {
+        color:#333;
+        text-decoration:none;
+      }
+      &.open {
+        a {
+          font-weight:bold;
+        }
+      }
+      &.adding {
+        a {
+          color:#ccc;
+        }
+      }
+      &:hover {
+        background-color:#0ee;
+      }
+    }
+  }
+}
+.name {
+  margin-top:2px;
+  display:inline-block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  vertical-align:top;
+}
+.favicon {
+  margin:2px 4px 0 0;
+  width:16px;
+  height:16px;
+  vertical-align:top;
+}
+.button {
+  margin:2px 4px 0 0;
+  background:url(../img/buttons.png);
+  width:16px;
+  height:16px;
+  display:inline-block;
+  cursor:pointer;
+  &.add {
+    background-position-y:-48px;
+  }
+  &.delete {
+    background-position-y:-64px;
+  }
+  &.open {
+    background-position-y:-32px;
+  }
+  &.edit {
+    background-position-y:-16px;
+  }
+  &.pin {
+    background-position-y:0px;
+  }
+  &.summary {
+    background-position-y:-80px;
+  }
+  &:hover {
+    background-position-x:-16px;
+  }
+  &:active {
+    background-position-x:-32px;
+  }
+}
+.flipper {
+  margin:0 4px;
+  background:url(../img/flipper-open.png);
+  float:left;
+  &.open {
+    background:url(../img/flipper-close.png);
+  }
+}

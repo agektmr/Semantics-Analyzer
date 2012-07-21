@@ -1,0 +1,21 @@
+{
+  "name": "Semantics Analyzer",
+  "description": "__MSG_description__",
+  "manifest_version": 2,
+  "version": "0.1.0",
+  "icons": {
+    "48": "img/48.png",
+    "128": "img/128.png"
+  },
+  "permissions": [
+    "experimental",
+    "tabs",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "scripts": ["js/background.js"]
+  },
+  "default_locale": "en",
+  "devtools_page": "devtools.html"
+}

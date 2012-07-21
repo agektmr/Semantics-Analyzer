@@ -1,0 +1,47 @@
+{
+  "open": {
+    "message": "Open project window"
+  },
+  "update": {
+    "message": "Append Tabs"
+  },
+  "edit": {
+    "message": "Edit this project"
+  },
+  "pin": {
+    "message": "Bind window to this project"
+  },
+  "remove": {
+    "message": "Remove"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "name_this": {
+    "message": "Save as new project"
+  },
+  "add_from_tabs": {
+    "message": "Add from existing tabs"
+  },
+  "description": {
+    "message": "Don't want to open too much tabs on Chrome? Are you organized person to open tabs per window? Then, this extension is for you. This extension lets you organize tabs on a window as a project and manage it as bookmarks."
+  },
+  "no_bookmarks_found": {
+    "message": "No Bookmarks Found"
+  },
+  "todays_project_summary": {
+    "message": "Today's Project Summary"
+  },
+  "project_name": {
+    "message": "Project Name"
+  },
+  "amount_of_time_spent": {
+    "message": "Amount of time spent"
+  },
+  "hour_min_sec": {
+    "message": "##hour##h ##min##m ##sec##s"
+  },
+  "new_project": {
+    "message": "New Project"
+  }
+}

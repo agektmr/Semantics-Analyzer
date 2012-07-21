@@ -1,0 +1,120 @@
+body {
+  margin: 8px;
+  width: 300px;
+  font-size: 0.8em;
+}
+#projects {
+  list-style: none;
+  margin-top: 8px;
+  padding: 0;
+  font-family: Arial;
+}
+.accordion {
+  -webkit-transition: max-height 0.2s ease-out;
+  max-height: 24px;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+.accordion.open {
+  max-height: 300px;
+  overflow-y: scroll;
+}
+.accordion:first-child span.button {
+  display: none;
+}
+.accordion .project {
+  background: -webkit-linear-gradient(#ffffff, #aaaaaa);
+  padding: 2px 4px;
+  border: outset 1px #aaa;
+  height: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.accordion .project:hover {
+  background: -webkit-linear-gradient(#ffffff, #eeeeee);
+  cursor: pointer;
+}
+.accordion .project span.name {
+  width: 256px;
+}
+.accordion .project span.name.current {
+  font-weight: bold;
+}
+.accordion input[type='text'] {
+  width: 220px;
+}
+.accordion ul {
+  margin: 0;
+  padding: 0;
+  border: outset 1px #eee;
+  text-decoration: none;
+}
+.accordion li .name {
+  width: 258px;
+}
+.accordion li .name a {
+  color: #333;
+  text-decoration: none;
+}
+.accordion li .name.open a {
+  font-weight: bold;
+}
+.accordion li .name.adding a {
+  color: #ccc;
+}
+.accordion li .name:hover {
+  background-color: #0ee;
+}
+.name {
+  margin-top: 2px;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+.favicon {
+  margin: 2px 4px 0 0;
+  width: 16px;
+  height: 16px;
+  vertical-align: top;
+}
+.button {
+  margin: 2px 4px 0 0;
+  background: url(../img/buttons.png);
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  cursor: pointer;
+}
+.button.add {
+  background-position-y: -48px;
+}
+.button.delete {
+  background-position-y: -64px;
+}
+.button.open {
+  background-position-y: -32px;
+}
+.button.edit {
+  background-position-y: -16px;
+}
+.button.pin {
+  background-position-y: 0px;
+}
+.button.summary {
+  background-position-y: -80px;
+}
+.button:hover {
+  background-position-x: -16px;
+}
+.button:active {
+  background-position-x: -32px;
+}
+.flipper {
+  margin: 0 4px;
+  background: url(../img/flipper-open.png);
+  float: left;
+}
+.flipper.open {
+  background: url(../img/flipper-close.png);
+}
