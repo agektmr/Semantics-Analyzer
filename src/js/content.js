@@ -1,5 +1,36 @@
 'use strict';
 
+/*
+Expected Microdata result:
+Microdata = [
+  {
+    type: 'http://schema.org/Article',
+    prop: [
+      {
+        propType: 'name',
+        property: 'Eiji Kitamura',
+        severity: 'info',
+        child: null
+      },
+      {
+        propType: 'image',
+        property: 'http://-****-/image.png',
+        severity: 'warning',
+        child: null
+      }
+    ],
+    severity: 'info',
+    children: [
+      {
+        type: 'http://schema.org/Event',
+        prop: [
+          ....
+        ]
+      }
+    ]
+  }
+]
+*/
 var SemanticsAnalyzer = {};
 SemanticsAnalyzer.Microdata = (function() {
   var parseGeneric = function(itemProp) {
@@ -11,53 +42,36 @@ SemanticsAnalyzer.Microdata = (function() {
   };
   Microdata.prototype = {
     startAbstraction: function() {
-      return this.getItemScopes();
+      var itemScopes = [],
+          itemProps  = [],
+          scopes     = document.querySelectorAll('*[itemscope]'),
+          props      = document.querySelectorAll('*[itemprop]');
+      for (var h = 0; h < props.length; h++) {
+        var prop = this.createItemProp(props[h]);
+        for (var i = scopes.length-1; i >= 0; i--) {
+          if (scopes[i].contains(props[h])) {
+            if (itemScopes[i] === undefined) {
+              itemScopes[i] = this.createItemScope(scopes[i]);
+            }
+            itemScopes[i].prop.push(prop);
+            break;
+          }
+        }
+      }
+      return itemScopes;
     },
-    getItemScopes: function() {
-      var that = this,
-          results = [],
-          itemScopes = document.querySelectorAll('*[itemscope]');
-      Array.prototype.forEach.call(itemScopes, function(itemScope) {
-        var result = that.getItemScope(itemScope);
-        if (result) results.push(result);
-      });
-      return results;
+    createItemScope: function(itemScope) {
+        return {
+          type: itemScope.getAttribute('itemtype'),
+          prop: [],
+          severity: 'info',
+          children: []
+        };
     },
-    getItemScope: function(itemScope) {
-      // Check see if this itemScope has already been processed.
-      var done = false;
-      this.itemScopesDone.forEach(function(scope) {
-        // If identical node found in done list, it's already done
-        if (scope.isSameNode(itemScope)) done = true;
-      });
-      if (done) return null;
-
-      this.itemScopesDone.push(itemScope);
-      var that = this,
-          item = {
-            type: itemScope.getAttribute('itemtype'),
-            prop: []
-          },
-          itemProps = itemScope.querySelectorAll('*[itemprop]');
-      Array.prototype.forEach.call(itemProps, function(itemProp) {
-        var prop = that.getItemProp(itemProp);
-        if (prop) item.prop.push(prop);
-      });
-      return item;
-    },
-    getItemProp: function(itemProp) {
-      // Check see if this itemScope has already been processed.
-      var done = false;
-      this.itemPropsDone.forEach(function(prop) {
-        // If identical node found in done list, it's already done
-        if (prop.isSameNode(itemProp)) done = true;
-      });
-      if (done) return null;
-
-      this.itemPropsDone.push(itemProp);
+    createItemProp: function(itemProp) {
       var node = {};
-      var type = itemProp.getAttribute('itemprop');
       // Auto generate method name
+      var type = itemProp.getAttribute('itemprop');
       var method = 'parse'+type.charAt(0).toUpperCase()+type.slice(1);
       if (this[method]) {
         node.property = this[method](itemProp);
@@ -67,13 +81,6 @@ SemanticsAnalyzer.Microdata = (function() {
       }
       node.propType = type;
       node.severity = !node.property ? 'warning' : 'info';
-      node.outerHTML = itemProp.outerHTML;
-      node.child = null;
-      if (itemProp.hasAttribute('itemscope')) {
-        // recursive traverse
-        node.type  = itemProp.getAttribute('itemtype');
-        node.child = this.getItemScope(itemProp);
-      }
       return node;
     },
     parseImage: function(itemProp) {

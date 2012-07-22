@@ -33,6 +33,9 @@ category.onAuditStarted.addListener(function(auditResults) {
     var length    = results.Microdata.length,
         severity  = auditResults.Severity.Info,
         details   = auditResults.createResult('Details...');
+    // results.Microdata.props.foEach(function(itemProp) {
+    //   for (var i = results.Microdata.scopes.length; i > 0; i--)
+    // });
     results.Microdata.forEach(function(microdata) {
       var child = details.addChild(microdata.type);
       microdata.prop.forEach(function(node) {
