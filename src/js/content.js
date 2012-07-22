@@ -62,7 +62,7 @@ SemanticsAnalyzer.Microdata = (function() {
     },
     createItemScope: function(itemScope) {
         return {
-          type: itemScope.getAttribute('itemtype'),
+          type: itemScope.getAttribute('itemtype'), // TODO: allow multiple types
           prop: [],
           severity: 'info',
           children: []
@@ -70,31 +70,41 @@ SemanticsAnalyzer.Microdata = (function() {
     },
     createItemProp: function(itemProp) {
       var node = {};
-      // Auto generate method name
-      var type = itemProp.getAttribute('itemprop');
-      var method = 'parse'+type.charAt(0).toUpperCase()+type.slice(1);
-      if (this[method]) {
-        node.property = this[method](itemProp);
-      } else {
-        // This itemprop is apparently broken (or undefined in this extension)
-        node.property = this.parseBroken(itemProp);
+      node.propType = itemProp.getAttribute('itemprop');
+      switch (itemProp.nodeName) {
+        case 'META':
+          node.property = itemProp.content || undefined;
+          break;
+        case 'AUDIO':
+        case 'EMBED':
+        case 'IFRAME':
+        case 'IMG':
+        case 'SOURCE':
+        case 'TRACK':
+        case 'VIDEO':
+          node.property = itemProp.src || undefined;
+          break;
+        case 'A':
+        case 'AREA':
+        case 'LINK':
+          node.property = itemProp.href || undefined;
+          break;
+        case 'OBJECT':
+          node.property = itemProp.data || undefined; // TODO: Check if this works
+          break;
+        case 'DATA':
+          node.property = itemProp.value || undefined; // TODO: Check if this works
+          break;
+        case 'TIME':
+          node.property = itemProp.getAttribute('datetime') || undefined;
+          break;
+        default:
+          node.property = itemProp.innerHTML || undefined;
+          break;
       }
-      node.propType = type;
       node.severity = !node.property ? 'warning' : 'info';
       return node;
-    },
-    parseImage: function(itemProp) {
-      return itemProp.src || undefined;
-    },
-    parseStartDate: function(itemProp) {
-      return itemProp.getAttribute('datetime') || undefined;
-    },
-    parseUrl: function(itemProp) {
-      return itemProp.href || undefined;
-    },
-    parseBroken: parseGeneric, // Parse broken itemProp so that the developer will know what is broken
-    parseName: parseGeneric,
-    parseJobTitle: parseGeneric
+    }
   };
   return function() {
     return new Microdata();
