@@ -1,26 +1,38 @@
-var microdataParser = function(node, detail, auditResults) {
-  var child = detail.addChild(node.propType || '');
-  var content = '';
-  if (node.child) {
-    child.addChild(node.type);
-    node.child.prop.forEach(function(childNode) {
-      microdataParser(childNode, child, auditResults);
+var microdataItemScopeParser = function(microdata, details, auditResults) {
+  microdata.forEach(function(itemScope) {
+    var child = details.addChild(itemScope.type);
+    // child.expanded = true;
+    itemScope.props.forEach(function(itemProp) {
+      microdataItemPropParser(itemProp, child, auditResults);
     });
+  });
+};
+var microdataItemPropParser = function(itemProp, detail, auditResults) {
+  var child = detail.addChild(itemProp.type || '');
+  child.expanded = true;
+  if (itemProp.children.length > 0) {
+    microdataItemScopeParser(itemProp.children, child, auditResults);
   } else {
-    switch (node.propType) {
-      case 'url' :
-        content = auditResults.createURL(node.property);
-        break;
-      case 'image' :
-        content = auditResults.createSnippet(node.property);
+    switch (itemProp.nodeName) {
+      case 'A' :
+      case 'AREA' :
+      case 'LINK' :
+      case 'AUDIO':
+      case 'EMBED':
+      case 'IFRAME':
+      case 'IMG':
+      case 'SOURCE':
+      case 'TRACK':
+      case 'VIDEO':
+        content = auditResults.createURL(itemProp.property);
         break;
       default :
-        content = node.property || '';
+        content = itemProp.property || '';
         break;
     }
-    if (node.severity == 'warning') severity = auditResults.Severity.Warning;
+    if (itemProp.severity == 'warning') severity = auditResults.Severity.Warning;
+    child.addChild(content);
   }
-  child.addChild(content);
 };
 
 var category = chrome.experimental.devtools.audits.addCategory('Semantics Analyzer', 3);
@@ -29,32 +41,21 @@ category.onAuditStarted.addListener(function(auditResults) {
     command: 'analyze',
     tabId: chrome.devtools.inspectedWindow.tabId
   }, function(results) {
+console.log(results);
     /* Microdata */
     var length    = results.Microdata.length,
         severity  = auditResults.Severity.Info,
         details   = auditResults.createResult('Details...');
-    // results.Microdata.props.foEach(function(itemProp) {
-    //   for (var i = results.Microdata.scopes.length; i > 0; i--)
-    // });
-    results.Microdata.forEach(function(microdata) {
-      var child = details.addChild(microdata.type);
-      microdata.prop.forEach(function(node) {
-        microdataParser(node, child, auditResults);
-      });
-    });
+    details.expanded = true;
+    microdataItemScopeParser(results.Microdata, details, auditResults);
     auditResults.addResult('Microdata ('+length+')', '', severity, details);
 
     /* microformats */
-    auditResults.addResult('microformats (5)',
-      '5 elements use font size below 10pt',
-      auditResults.Severity.Info,
-      details);
+    // auditResults.addResult('microformats (0)', '', auditResults.Severity.Info, details);
 
     /* Open Graph Protocol */
-    auditResults.addResult('Open Graph Protocol (5)',
-      '5 elements use font size below 10pt',
-      auditResults.Severity.Info,
-      details);
+    // auditResults.addResult('Open Graph Protocol (0)', '', auditResults.Severity.Info, details);
+
     auditResults.done();
   });
 });

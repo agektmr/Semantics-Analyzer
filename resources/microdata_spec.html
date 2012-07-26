@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Microdata stub</title>
+    <meta charset="utf-8" />
+    <script src=""></script>
+  </head>
+  <body>
+    <header><h1>Microdata stub</h1></header>
+    <section>
+      <article itemscope>
+        <h1 itemprop="section">5.1.2 The basic syntax</h1>
+        <p>My name is <span itemprop="name">Neil</span.</p>
+        <p>My band is called <span itemprop="band">Four Parts Water</span.</p>
+        <p>I am <span itemprop="nationality">British</span.</p>
+        <img itemprop="image" src="https://www.google.co.jp/images/srpr/logo3w.png" alt="Google">
+        <data itemprop="product-id" value="9678AOU879">The Instigator 2000</data>
+        <p>I was born on <time itemprop="birthday" datetime="2009-05-10">May 10th 2009</time>.</p>
+      </article>
+      <article>
+        <h1>5.1.2 The basic syntax (reference)</h1>
+        <div itemscope id="amanda" itemref="a b"></div>
+        <p id="a">Name: <span itemprop="name">Amanda</span></p>
+        <div id="b" itemprop="band" itemscope itemref="c"></div>
+        <div id="c">
+          <p>Band: <span itemprop="name">Jazz Band</span></p>
+          <p>Size: <span itemprop="size">12</span> players</p>
+        </div>
+      </article>
+      <article itemscope>
+        <h1 itemprop="section">5.1.2 The basic syntax (multiple nodes with same props)</h1>
+        <p>Flavors in my favorite ice cream:</p>
+        <ul>
+          <li itemprop="flavor">Lemon sorbet</li>
+          <li itemprop="flavor">Apricot sorbet</li>
+        </ul>
+      </article>
+      <article itemscope>
+        <h1 itemprop="section">5.1.2 The basic syntax (multiple props in same node)</h1>
+        <span itemprop="favorite-color favorite-fruit">orange</span>
+      </article>
+      <article  itemscope itemtype="http://example.org/animals#cat">
+        <h1 itemprop="name">Hedral</h1>
+        <p itemprop="desc">Hedral is a male american domestic
+        shorthair, with a fluffy black fur with white paws and belly.</p>
+        <img itemprop="img" src="hedral.jpeg" alt="" title="Hedral, age 18 months">
+      </article>
+      <article>
+        <h1>5.1.4 Global identifiers for items</h1>
+        <dl itemscope itemtype="http://vocab.example.net/book"itemid="urn:isbn:0-330-34032-8">
+          <dt>Title
+          <dd itemprop="title">The Reality Dysfunction
+          <dt>Author
+          <dd itemprop="author">Peter F. Hamilton
+          <dt>Publication date
+          <dd><time itemprop="pubdate" datetime="1996-01-26">26 January 1996</time>
+        </dl> 
+      </article>
+    </section>
+    <footer>
+    </footer>
+  </body>
+</html>

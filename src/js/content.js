@@ -7,73 +7,99 @@ Microdata = [
     type: 'http://schema.org/Article',
     prop: [
       {
-        propType: 'name',
+        type: 'name',
         property: 'Eiji Kitamura',
         severity: 'info',
-        child: null
+        children: null
       },
       {
-        propType: 'image',
+        type: 'image',
         property: 'http://-****-/image.png',
         severity: 'warning',
-        child: null
-      }
-    ],
-    severity: 'info',
-    children: [
-      {
-        type: 'http://schema.org/Event',
-        prop: [
-          ....
+        children: [
+          {
+            type: 'http://schema.org/Event',
+            prop: [
+              ....
+            ]
+          }
         ]
       }
-    ]
+    ],
+    severity: 'info'
   }
 ]
 */
 var SemanticsAnalyzer = {};
-SemanticsAnalyzer.Microdata = (function() {
-  var parseGeneric = function(itemProp) {
-    return itemProp.innerHTML || undefined;
-  };
-  var Microdata = function() {
-    this.itemScopesDone = [];
-    this.itemPropsDone  = [];
-  };
-  Microdata.prototype = {
-    startAbstraction: function() {
-      var itemScopes = [],
-          itemProps  = [],
-          scopes     = document.querySelectorAll('*[itemscope]'),
-          props      = document.querySelectorAll('*[itemprop]');
-      for (var h = 0; h < props.length; h++) {
-        var prop = this.createItemProp(props[h]);
-        for (var i = scopes.length-1; i >= 0; i--) {
-          if (scopes[i].contains(props[h])) {
-            if (itemScopes[i] === undefined) {
-              itemScopes[i] = this.createItemScope(scopes[i]);
+SemanticsAnalyzer.Microdata = function() {
+};
+SemanticsAnalyzer.Microdata.prototype = {
+  startAbstraction: function() {
+    var referenced = [], // array of referenced itemscopes contained in other itemprop
+        itemScopes = [],
+        itemProps  = [],
+        scopes     = document.querySelectorAll('*[itemscope]'),
+        props      = document.querySelectorAll('*[itemprop]');
+    for (var i = 0; i < scopes.length; i++) {
+      itemScopes[i] = this.createItemScope(scopes[i]);
+    }
+    // for (var j = props.length-1; j >= 0; j--) {
+    for (var j = 0; j < props.length; j++) {
+      var prop = this.createItemProps(props[j]);
+      var contained = false;
+      for (var k = scopes.length-1; k >= 0; k--) {
+        var itemRefs = [],
+            itemRef = scopes[k].getAttribute('itemref');
+        if (itemRef) itemRefs = itemRef.split(' ');
+        if (scopes[k].isSameNode(props[j])) {
+          // append as child itemScope
+          prop[0].children.push(itemScopes[k]);
+          // prepend referenced index
+          referenced.unshift(k);
+        } else if (scopes[k].contains(props[j])) {
+          itemScopes[k].props = itemScopes[k].props.concat(prop);
+          contained = true;
+          break;
+        } else {
+          // look for itemref reference if exists
+          for (var l = 0; l < itemRefs.length; l++) {
+            var ref = document.getElementById(itemRefs[l]);
+            if (ref && ref.contains(props[j])) {
+              itemScopes[k].props = itemScopes[k].props.concat(prop);
+              contained = true;
+              break;
             }
-            itemScopes[i].prop.push(prop);
-            break;
           }
         }
       }
-      return itemScopes;
-    },
-    createItemScope: function(itemScope) {
-        return {
-          type: itemScope.getAttribute('itemtype'), // TODO: allow multiple types
-          prop: [],
-          severity: 'info',
-          children: []
-        };
-    },
-    createItemProp: function(itemProp) {
-      var node = {};
-      node.propType = itemProp.getAttribute('itemprop');
-      switch (itemProp.nodeName) {
+      // if (!scoped) // indicate severity warning
+    }
+    // Remove referenced itemScopes
+    referenced.forEach(function(ref) {
+      itemScopes.splice(ref, 1);
+    });
+    return itemScopes;
+  },
+  createItemScope: function(itemScope) {
+      return {
+        id: itemScope.getAttribute('itemid') || '',
+        type: itemScope.getAttribute('itemtype') || 'No itemType specified',
+        props: [],
+        severity: 'info'
+      };
+  },
+  createItemProps: function(itemProp) {
+    var type = itemProp.getAttribute('itemprop');
+    if (!type) return [];
+    var types = type.split(' ');
+    var props = [];
+    for (var i = 0; i < types.length; i++) {
+      var prop = {};
+      prop.type = types[i];
+      prop.nodeName = itemProp.nodeName;
+      switch (prop.nodeName) {
         case 'META':
-          node.property = itemProp.content || undefined;
+          prop.property = itemProp.content || undefined;
           break;
         case 'AUDIO':
         case 'EMBED':
@@ -82,34 +108,33 @@ SemanticsAnalyzer.Microdata = (function() {
         case 'SOURCE':
         case 'TRACK':
         case 'VIDEO':
-          node.property = itemProp.src || undefined;
+          prop.property = itemProp.src || undefined;
           break;
         case 'A':
         case 'AREA':
         case 'LINK':
-          node.property = itemProp.href || undefined;
+          prop.property = itemProp.href || undefined;
           break;
         case 'OBJECT':
-          node.property = itemProp.data || undefined; // TODO: Check if this works
+          prop.property = itemProp.data || undefined; // TODO: Check if this works
           break;
         case 'DATA':
-          node.property = itemProp.value || undefined; // TODO: Check if this works
+          prop.property = itemProp.getAttribute('value') || undefined;
           break;
         case 'TIME':
-          node.property = itemProp.getAttribute('datetime') || undefined;
+          prop.property = itemProp.getAttribute('datetime') || undefined;
           break;
         default:
-          node.property = itemProp.innerHTML || undefined;
+          prop.property = itemProp.textContent || undefined;
           break;
       }
-      node.severity = !node.property ? 'warning' : 'info';
-      return node;
+      prop.severity = !prop.property ? 'warning' : 'info';
+      prop.children = [];
+      props.push(prop);
     }
-  };
-  return function() {
-    return new Microdata();
-  };
-})();
+    return props;
+  }
+};
 SemanticsAnalyzer.microformats = function() {
 
 };

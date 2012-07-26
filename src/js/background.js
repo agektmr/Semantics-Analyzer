@@ -25,7 +25,7 @@ var SemanticsAnalyzer = {
         return true;
       });
     });
-  } 
+  }
 };
 
 chrome.extension.onRequest.addListener(function(req, sender, callback) {
